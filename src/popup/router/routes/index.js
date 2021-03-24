@@ -35,6 +35,7 @@ import SecuritySettings from '../pages/SecuritySettings';
 import Send from '../pages/Send';
 import Settings from '../pages/Settings';
 import SignMessage from '../pages/SignMessage';
+import SignTransaction from '../pages/SignTransaction';
 import SuccessTip from '../pages/SuccessTip';
 import TermsOfService from '../pages/TermsOfService';
 import Tip from '../pages/Tip';
@@ -418,6 +419,16 @@ export default [
     component: SignMessage,
     meta: {
       title: 'sign-message',
+      notPersist: true,
+      notRebrand: true,
+    },
+  },
+  {
+    name: 'sign-transaction',
+    path: '/sign-transaction',
+    component: SignTransaction,
+    meta: {
+      title: 'sign-transaction',
       notPersist: true,
       notRebrand: true,
     },
