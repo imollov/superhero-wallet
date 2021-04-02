@@ -16,7 +16,7 @@
 
 <script>
 import { pick } from 'lodash-es';
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import TokensListItem from './TokensListItem';
 
 export default {
@@ -31,7 +31,8 @@ export default {
     return pick(this.$store.state.observables, ['tokenBalance', 'balanceCurrency']);
   },
   computed: {
-    ...mapState('fungibleTokens', ['tokenBalances', 'availableTokens', 'aePublicData']),
+    ...mapState('fungibleTokens', ['availableTokens', 'aePublicData']),
+    ...mapGetters('fungibleTokens', ['tokenBalances']),
 
     /**
      * Returns the default aeternity meta information

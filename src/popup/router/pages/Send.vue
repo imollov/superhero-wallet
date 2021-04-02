@@ -222,9 +222,10 @@ export default {
     return pick(this.$store.state.observables, ['balance']);
   },
   computed: {
-    ...mapState('fungibleTokens', ['selectedToken', 'availableTokens']),
+    ...mapState('fungibleTokens', ['availableTokens']),
     ...mapState(['current', 'sdk']),
     ...mapGetters(['account', 'formatCurrency', 'currentCurrencyRate']),
+    ...mapGetters('fungibleTokens', ['selectedToken']),
     validAddress() {
       return checkAddress(this.form.address) || checkAensName(this.form.address);
     },

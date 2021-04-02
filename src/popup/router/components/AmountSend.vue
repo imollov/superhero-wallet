@@ -59,7 +59,7 @@
 
 <script>
 import { pick } from 'lodash-es';
-import { mapGetters, mapState } from 'vuex';
+import { mapGetters } from 'vuex';
 import InputField from './InputField';
 
 export default {
@@ -78,7 +78,7 @@ export default {
   },
   computed: {
     ...mapGetters(['formatCurrency']),
-    ...mapState('fungibleTokens', ['selectedToken']),
+    ...mapGetters('fungibleTokens', ['selectedToken']),
     currencyAmount() {
       return ((this.value || 0) * this.$store.getters.currentCurrencyRate).toFixed(2);
     },
