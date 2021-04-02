@@ -36,14 +36,14 @@ export default (store) => {
     actions: {
       async fetchOwned({
         state: { owned },
-        rootGetters: { activeNetwork, account },
+        rootGetters: { activeNetwork, accounts },
         rootState: { middleware },
         commit,
         getters: { getDefault },
         dispatch,
       }) {
         if (!middleware) return;
-        const getPendingNameClaimTransactions = () => dispatch('fetchPendingTransactions', {}, { root: true }).then((transactions) => transactions
+        const getPendingNameClaimTransactions = (address) => dispatch('fetchPendingTransactions', address, { root: true }).then((transactions) => transactions
           .filter(({ tx: { type } }) => type === 'NameClaimTx')
           .map(({ tx, ...otherTx }) => ({
             ...otherTx,
@@ -51,11 +51,10 @@ export default (store) => {
             owner: tx.accountId,
           })));
 
-        const defaultName = getDefault(account.address);
-        const names = await Promise.all([
-          getPendingNameClaimTransactions(),
-          middleware.getOwnedBy(account.address)
-            .then(({ active }) => active.map(({ info, name }) => ({
+        const names = await Promise.all(
+          accounts.map(({ address }) => Promise.all([
+            getPendingNameClaimTransactions(address),
+            middleware.getOwnedBy(address).then(({ active }) => active.map(({ info, name }) => ({
               createdAtHeight: info.activeFrom,
               expiresAt: info.expireHeight,
               owner: info.ownership.current,
@@ -63,25 +62,32 @@ export default (store) => {
               autoExtend: owned.find((n) => n.name === name)?.autoExtend,
               name,
             }))),
-        ]).then((arr) => arr.flat());
+          ])),
+        ).then((arr) => arr.flat(2));
 
         commit('set', names);
 
         const claimed = names.filter((n) => !n.pending).map(({ name }) => name);
-        if (!claimed.length) {
-          if (defaultName) commit('setDefault', { address: account.address });
-          return;
-        }
-        const { preferredChainName: defaultNameBackend } = await fetchJson(
-          `${activeNetwork.backendUrl}/profile/${account.address}`,
-        ).catch(() => ({}));
-        if (!claimed.includes(defaultNameBackend)) {
-          await dispatch('setDefault', { address: account.address, name: claimed[0] });
-          return;
-        }
-        if (defaultName !== defaultNameBackend) {
-          commit('setDefault', { address: account.address, name: defaultNameBackend });
-        }
+        accounts.forEach(async ({ address }) => {
+          const defaultName = getDefault(address);
+          if (!claimed.length) {
+            if (defaultName) commit('setDefault', { address });
+            return;
+          }
+          const { preferredChainName: defaultNameBackend } = await fetchJson(
+            `${activeNetwork.backendUrl}/profile/${address}`,
+          ).catch(() => ({}));
+          if (!claimed.includes(defaultNameBackend)) {
+            await dispatch('setDefault', {
+              address,
+              name: names.filter((n) => !n.pending && n.owner === address)[0]?.name,
+            });
+            return;
+          }
+          if (defaultName !== defaultNameBackend) {
+            commit('setDefault', { address, name: defaultNameBackend });
+          }
+        });
       },
       async fetchAuctions({ rootState: { middleware } }) {
         if (!middleware) return [];
@@ -164,6 +170,15 @@ export default (store) => {
           .filter(({ expiresAt }) => expiresAt - height < AUTO_EXTEND_NAME_BLOCKS_INTERVAL)
           .map(({ name }) => store.dispatch('names/updatePointer', { name, type: 'extend' })),
       );
+    },
+    { immediate: true },
+  );
+
+  store.watch(
+    ({ accountCount }) => accountCount,
+    async () => {
+      if (!store.state.middleware) return;
+      await store.dispatch('names/fetchOwned');
     },
     { immediate: true },
   );
