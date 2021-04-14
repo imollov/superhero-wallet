@@ -14,7 +14,6 @@
         half,
         small,
         onboarding,
-        dark,
         third,
         inline,
         inactive,
@@ -41,7 +40,6 @@ export default {
     small: Boolean,
     third: Boolean,
     onboarding: Boolean,
-    dark: Boolean,
     inline: Boolean,
     inactive: Boolean,
     to: [String, Object],
@@ -94,14 +92,17 @@ export default {
   }
 
   &.secondary {
-    background-color: $color-black;
+    background-color: $color-border;
+    color: $color-light-grey;
 
     &:hover {
       background-color: $color-hover;
+      color: $color-white;
     }
 
     &:active {
-      background: rgba($color-bg-3, 0.8);
+      background: $color-darker-grey;
+      color: rgba($color-white, 0.8);
     }
   }
 
@@ -130,10 +131,6 @@ export default {
     width: 48%;
     margin: 0;
     display: inline-block;
-  }
-
-  &.dark {
-    background: $color-bg-2;
   }
 
   &.small {
