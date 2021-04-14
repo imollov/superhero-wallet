@@ -49,7 +49,7 @@ export default {
     display: flex;
 
     .text {
-      flex: 1;
+      flex: 2;
       display: flex;
       align-items: center;
       padding: 0 8px;
