@@ -121,6 +121,7 @@ export default {
     width: 100%;
     height: 100%;
     padding: 0;
+    padding-top: env(safe-area-inset-top);
     border-radius: 0;
 
     @include desktop {
@@ -141,6 +142,7 @@ export default {
       bottom: 0;
       width: 100%;
       padding: 24px 0;
+      padding-bottom: calc(24px + env(safe-area-inset-bottom));
 
       @include desktop {
         border-radius: 0 0 10px 10px;
