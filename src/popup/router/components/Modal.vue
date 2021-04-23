@@ -56,6 +56,7 @@ export default {
 
 <style lang="scss" scoped>
 @import '../../../styles/variables';
+@import '../../../styles/mixins';
 
 .modal {
   position: fixed;
@@ -122,6 +123,13 @@ export default {
     padding: 0;
     border-radius: 0;
 
+    @include desktop {
+      width: $extension-width;
+      height: 600px;
+      border-radius: 10px;
+      box-shadow: $color-border 0 0 0 1px;
+    }
+
     .body {
       height: 100%;
       padding-bottom: 80px;
@@ -129,10 +137,14 @@ export default {
     }
 
     .footer {
-      position: fixed;
+      position: sticky;
       bottom: 0;
       width: 100%;
       padding: 24px 0;
+
+      @include desktop {
+        border-radius: 0 0 10px 10px;
+      }
     }
   }
 
